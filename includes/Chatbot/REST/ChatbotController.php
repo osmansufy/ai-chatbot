@@ -258,6 +258,17 @@ class ChatbotController extends DokanBaseVendorController {
                 'maximum'     => 5,
                 'description' => __( 'Filter reviews by rating', 'dokan-chatbot' ),
             ],
+            'intent_confirmed' => [
+                'type'        => 'boolean',
+                'required'    => false,
+                'default'     => false,
+                'description' => __( 'Intent confirmed', 'dokan-chatbot' ),
+            ],
+            'type' => [
+                'type'        => 'string',
+                'required'    => false,
+                'description' => __( 'Intent type', 'dokan-chatbot' ),
+            ],
         ];
     }
 
@@ -367,7 +378,33 @@ class ChatbotController extends DokanBaseVendorController {
         ];
 
         // Extract query parameters for context building
-        $query_params = $this->extract_query_params( $request );
+        $query_params = $request->get_params();
+
+        // If intent_confirmed and type is present, handle specific intent action directly
+        if ( ! empty( $query_params['intent_confirmed'] ) && ! empty( $query_params['type'] ) ) {
+            $intent_type = $query_params['type'];
+            switch ( $intent_type ) {
+                case 'search_product':
+                    // Pass all extra params to search_products
+                    $search_query = $query_params['query'] ?? "";
+                    $product_type = $query_params['product_type'] ?? null;
+                    $products_category = $query_params['products_category'] ?? null;
+                    $products_page = $query_params['products_page'] ?? 1;
+                    $products_per_page = $query_params['products_per_page'] ?? 10;
+                    $result = $this->search_products_advanced( $search_query, $vendor_id, $product_type, $products_category, $products_page, $products_per_page );
+                    return rest_ensure_response([
+                        'response' => $result,
+                        'context' => [],
+                        'timestamp' => current_time( 'mysql' ),
+                        'message_id' => null,
+                        'query_params' => $query_params,
+                    ]);
+                // Add more intent types as needed
+                default:
+                    // Fallback to normal processing
+                    break;
+            }
+        }
 
         try {
             $response = $chatbot_service->process_message( $message, $context, $query_params );
@@ -375,10 +412,19 @@ class ChatbotController extends DokanBaseVendorController {
 
             // Fallback: If AI response is insufficient, trigger action
             if ( $this->ai_needs_action( $ai_response ) ) {
+                // Try to use all available intent parameters for fallback
                 $intent = $this->detect_intent( $message );
+                $intent = array_merge($intent, $query_params); // merge any extra params
                 switch ( $intent['type'] ) {
                     case 'search_product':
-                        $action_response = $this->search_products( $intent['query'], $vendor_id );
+                        $action_response = $this->search_products_advanced(
+                            $intent['query'] ?? $message,
+                            $vendor_id,
+                            $intent['product_type'] ?? null,
+                            $intent['products_category'] ?? null,
+                            $intent['products_page'] ?? 1,
+                            $intent['products_per_page'] ?? 10
+                        );
                         break;
                     case 'check_order':
                         $action_response = $this->get_order_details( $intent['order_id'], $vendor_id );
@@ -687,6 +733,40 @@ class ChatbotController extends DokanBaseVendorController {
      */
     public function check_permission(): bool {
         return is_user_logged_in();
+    }
+
+    /**
+     * Advanced product search supporting extra parameters (type, category, pagination)
+     */
+    private function search_products_advanced( $query, $vendor_id = null, $product_type = null, $products_category = null, $products_page = 1, $products_per_page = 10 ) {
+        if ( ! class_exists( 'WC_Product_Query' ) ) {
+            return __( 'Product search is not available.', 'dokan-chatbot' );
+        }
+        $args = [
+            'limit' => $products_per_page,
+            'status' => 'publish',
+            's' => $query,
+            'paged' => $products_page,
+        ];
+        if ( $vendor_id ) {
+            $args['author'] = $vendor_id;
+        }
+        if ( $product_type ) {
+            $args['type'] = $product_type;
+        }
+        if ( $products_category ) {
+            $args['category'] = $products_category;
+        }
+        $product_query = new \WC_Product_Query( $args );
+        $products = $product_query->get_products();
+        if ( empty( $products ) ) {
+            return __( 'No products found matching your query.', 'dokan-chatbot' );
+        }
+        $result = __( 'Here are some products I found:', 'dokan-chatbot' ) . "\n";
+        foreach ( $products as $product ) {
+            $result .= sprintf( "%s (ID: %d) - %s\n", $product->get_name(), $product->get_id(), $product->get_price_html() );
+        }
+        return $result;
     }
 }
 

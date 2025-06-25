@@ -15,6 +15,7 @@ const ChatbotWidget = () => {
     const [historyLoaded, setHistoryLoaded] = useState(false);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [historyPage, setHistoryPage] = useState(0);
+    const [pendingIntent, setPendingIntent] = useState(null);
     
     const widgetRef = useRef(null);
 
@@ -120,19 +121,21 @@ const ChatbotWidget = () => {
         }
     };
 
-    const sendMessage = async (message) => {
+    const sendMessage = async (message, extraParams = {}) => {
         if (!message.trim() || isLoading || remainingMessages <= 0) {
             return;
         }
 
-        const newMessage = {
-            id: Date.now(),
-            content: message,
-            type: 'user',
-            timestamp: new Date(),
-        };
-
-        setMessages(prev => [...prev, newMessage]);
+        // If confirming an intent, don't add a new user message
+        if (!extraParams.intent_confirmed) {
+            const newMessage = {
+                id: Date.now(),
+                content: message,
+                type: 'user',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, newMessage]);
+        }
         setIsLoading(true);
         setError(null);
 
@@ -147,6 +150,7 @@ const ChatbotWidget = () => {
                     message: message,
                     role: currentRole,
                     vendor_id: vendorId,
+                    ...extraParams,
                 }),
             });
 
@@ -161,6 +165,15 @@ const ChatbotWidget = () => {
                 };
                 setMessages(prev => [...prev, aiMessage]);
                 setRemainingMessages(prev => prev - 1);
+                setPendingIntent(null);
+            } else if (data.requires_followup && data.intent) {
+                // Show intent confirmation UI
+                setPendingIntent({
+                    intent: data.intent,
+                    message,
+                    context: data.context,
+                    query_params: data.query_params,
+                });
             } else {
                 throw new Error(data.message || strings.error || 'An error occurred');
             }
@@ -174,9 +187,26 @@ const ChatbotWidget = () => {
                 isError: true,
             };
             setMessages(prev => [...prev, errorMessage]);
+            setPendingIntent(null);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Handler for confirming intent
+    const handleConfirmIntent = () => {
+        if (pendingIntent) {
+            sendMessage(pendingIntent.message, {
+                intent_confirmed: true,
+                ...pendingIntent.intent,
+                ...pendingIntent.query_params,
+            });
+        }
+    };
+
+    // Handler for cancelling intent
+    const handleCancelIntent = () => {
+        setPendingIntent(null);
     };
 
     const clearChat = async () => {
@@ -242,6 +272,9 @@ const ChatbotWidget = () => {
                     onClose={() => setIsOpen(false)}
                     settings={settings}
                     strings={strings}
+                    pendingIntent={pendingIntent}
+                    onConfirmIntent={handleConfirmIntent}
+                    onCancelIntent={handleCancelIntent}
                 />
             )}
         </div>

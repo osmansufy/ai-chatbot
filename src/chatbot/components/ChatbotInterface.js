@@ -21,7 +21,10 @@ const ChatbotInterface = ({
     onLoadMoreHistory,
     onClose,
     settings,
-    strings
+    strings,
+    pendingIntent,
+    onConfirmIntent,
+    onCancelIntent,
 }) => {
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef(null);
@@ -87,6 +90,28 @@ const ChatbotInterface = ({
                     />
                 )}
                 
+                {pendingIntent && (
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl my-2 flex flex-col items-center">
+                        <div className="mb-2 text-yellow-800 font-semibold">
+                            {__('Intent detected:', 'dokan-chatbot')} <span className="font-mono">{pendingIntent.intent.type}</span>
+                        </div>
+                        {pendingIntent.intent.query && (
+                            <div className="mb-2 text-sm text-gray-700">{__('Query:', 'dokan-chatbot')} <span className="font-mono">{pendingIntent.intent.query}</span></div>
+                        )}
+                        {pendingIntent.intent.order_id && (
+                            <div className="mb-2 text-sm text-gray-700">{__('Order ID:', 'dokan-chatbot')} <span className="font-mono">{pendingIntent.intent.order_id}</span></div>
+                        )}
+                        <div className="flex gap-2 mt-2">
+                            <button className="px-4 py-1 rounded bg-dokan-primary-500 text-white font-semibold hover:bg-dokan-primary-700" onClick={onConfirmIntent} disabled={isLoading}>
+                                {__('Confirm', 'dokan-chatbot')}
+                            </button>
+                            <button className="px-4 py-1 rounded bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300" onClick={onCancelIntent} disabled={isLoading}>
+                                {__('Cancel', 'dokan-chatbot')}
+                            </button>
+                        </div>
+                    </div>
+                )}
+                
                 <div ref={messagesEndRef} />
             </div>
             
@@ -95,7 +120,7 @@ const ChatbotInterface = ({
                 onChange={setInputValue}
                 onSend={handleSendMessage}
                 onKeyPress={handleKeyPress}
-                isLoading={isLoading}
+                isLoading={isLoading || !!pendingIntent}
                 remainingMessages={remainingMessages}
                 strings={strings}
             />

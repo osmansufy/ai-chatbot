@@ -6,8 +6,66 @@ use Exception;
 use WeDevs\Dokan\Intelligence\Services\EngineFactory;
 use WeDevs\Dokan\Chatbot\Utils\ChatHistory;
 use WeDevs\Dokan\Chatbot\Utils\PromptTemplates;
+use function __;
+use function current_time;
 
 class ChatbotService {
+
+    /**
+     * Advanced intent detection from user message
+     *
+     * @param string $message
+     * @return array [ 'type' => string, ... ]
+     */
+    private function detect_intent( string $message ): array {
+        $msg = strtolower( $message );
+        // Product search
+        if ( preg_match( '/search (?:for )?(?:product|products) (.+)/i', $message, $matches ) ) {
+            return [ 'type' => 'search_product', 'query' => trim( $matches[1] ) ];
+        }
+        // Check order
+        if ( preg_match( '/order\s+#?(\d+)/i', $message, $matches ) ) {
+            return [ 'type' => 'check_order', 'order_id' => intval( $matches[1] ) ];
+        }
+        // Add more advanced intent detection here as needed
+        // e.g. regex for analytics, reviews, etc.
+        return [ 'type' => 'unknown' ];
+    }
+
+    /**
+     * AI-based intent detection from user message, with regex fallback
+     *
+     * @param string $message
+     * @return array [ 'type' => string, ... ]
+     */
+    private function detect_intent_with_ai( string $message ): array {
+        $prompt = <<<EOT
+Classify the following user message into one of these intents: search_product, check_order, get_reviews, general_question.
+If possible, extract any relevant parameters (e.g., product name, order id).
+Respond ONLY in this JSON format:
+{"intent": "...", "parameters": {...}}
+
+User message: "{$message}"
+EOT;
+
+        $ai_service = EngineFactory::create();
+        $response = $ai_service->process($prompt, [
+            'chatbot_mode' => false,
+            'role' => 'system',
+        ]);
+
+        $intent_data = json_decode($response['response'], true);
+        if (is_array($intent_data) && isset($intent_data['intent'])) {
+            // Normalize to match previous structure
+            $type = $intent_data['intent'];
+            $params = isset($intent_data['parameters']) && is_array($intent_data['parameters']) ? $intent_data['parameters'] : [];
+            $result = array_merge(['type' => $type], $params);
+            return $result;
+        }
+
+        // Fallback to regex-based detection
+        return $this->detect_intent($message);
+    }
 
     /**
      * Process chatbot message
@@ -27,18 +85,36 @@ class ChatbotService {
             $role = $context['role'] ?? 'customer';
             $vendor_id = $context['vendor_id'] ?? null;
 
+            $allowed_intents = ['search_product', 'check_order']; // Expand as needed
+
+            if (empty($query_params['intent_confirmed'])) {
+                // Step 1: Detect intent (AI-based, with fallback)
+                $intent = $this->detect_intent_with_ai($message);
+                // If intent is allowed and not confirmed, return intent to frontend for confirmation/followup
+                if (in_array($intent['type'], $allowed_intents)) {
+                    return [
+                        'intent' => $intent,
+                        'message' => __('Intent detected. Please confirm or provide more details.', 'dokan-chatbot'),
+                        'requires_followup' => true,
+                    ];
+                }
+            } else {
+                // Use the provided intent and parameters directly
+                $intent = $query_params;
+            }
+
             // Validate query parameters
             $context_builder = new ContextBuilder();
             $validated_query_params = $context_builder->validate_query_params($query_params);
 
-            // Build context for the AI
+            // Build context for the AI (for specific intent, you may want to adjust context building)
             $enhanced_context = $context_builder->build_context( $user_id, $role, $vendor_id, $validated_query_params );
 
             // Get conversation history
             $chat_history = new ChatHistory();
             $recent_messages = $chat_history->get_recent_messages( $user_id, 5 );
 
-            // Build the prompt with context
+            // Build the prompt with context (for specific intent, you may want to adjust prompt)
             $prompt = $this->build_chatbot_prompt( $message, $enhanced_context, $recent_messages, $role );
 
             // Get AI service from Dokan
@@ -55,6 +131,21 @@ class ChatbotService {
             // Validate AI response
             if (empty($response['response'])) {
                 throw new Exception(__('AI service returned an empty response.', 'dokan-chatbot'));
+            }
+
+            // If AI cannot answer and intent is specific, return intent for frontend to handle
+            $ai_response = $response['response'];
+            $needs_action = $this->ai_needs_action($ai_response);
+            if ($needs_action && in_array($intent['type'], $allowed_intents)) {
+                return [
+                    'intent' => $intent,
+                    'message' => __( 'Further action required for this intent.', 'dokan-chatbot' ),
+                    'requires_followup' => true,
+                    'context' => $enhanced_context,
+                    'timestamp' => current_time( 'mysql' ),
+                    'message_id' => $chat_history->get_last_message_id($user_id),
+                    'query_params' => $validated_query_params,
+                ];
             }
 
             // Fire action for extensibility
@@ -556,5 +647,30 @@ class ChatbotService {
             error_log("Dokan Chatbot: Error clearing conversation history: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Detect if AI response is insufficient and needs action
+     *
+     * @param string $ai_response
+     * @return bool
+     */
+    private function ai_needs_action( $ai_response ): bool {
+        $needles = [
+            'I need more information',
+            'I am not sure',
+            'I can\'t answer',
+            'I do not have enough context',
+            'Sorry, I don\'t have that information',
+            'I am unable to',
+            'I cannot',
+            'I don\'t know',
+        ];
+        foreach ( $needles as $needle ) {
+            if ( stripos( $ai_response, $needle ) !== false ) {
+                return true;
+            }
+        }
+        return false;
     }
 }
