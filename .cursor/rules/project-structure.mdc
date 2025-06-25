@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Project Structure Guide
+
+This project is a WordPress plugin with AI chatbot functionality. The main entry point is [dokan-ai-chatbot.php](mdc:dokan-chatbot/dokan-ai-chatbot.php), which bootstraps the plugin and loads all core features.
+
+## Key Directories
+- **[includes/](mdc:dokan-chatbot/includes)**: Contains PHP source code, organized by feature (Chatbot, Admin, REST, Services, Utils).
+- **[assets/](mdc:dokan-chatbot/assets)**: Static assets (CSS, JS) for both admin and frontend chatbot UI.
+- **[src/](mdc:dokan-chatbot/src)**: React components and JavaScript logic for admin and chatbot interfaces.
+- **[templates/](mdc:dokan-chatbot/templates)**: PHP templates for rendering chatbot widgets.
+- **[tests/](mdc:dokan-chatbot/tests)**: PHPUnit and integration tests for backend logic.
+
+## AI Integration
+- AI logic and context building are handled in [includes/Chatbot/Services/ChatbotService.php](mdc:dokan-chatbot/includes/Chatbot/Services/ChatbotService.php) and [includes/Chatbot/Services/ContextBuilder.php](mdc:dokan-chatbot/includes/Chatbot/Services/ContextBuilder.php).
+- REST API endpoints for the chatbot are defined in [includes/Chatbot/REST/ChatbotController.php](mdc:dokan-chatbot/includes/Chatbot/REST/ChatbotController.php).
+
+## Entry Points
+- **PHP**: [dokan-ai-chatbot.php](mdc:dokan-chatbot/dokan-ai-chatbot.php)
+- **Admin React App**: [src/admin/index.js](mdc:dokan-chatbot/src/admin/index.js)
+- **Frontend Chatbot Widget**: [src/chatbot/index.js](mdc:dokan-chatbot/src/chatbot/index.js)
+
+Refer to this rule for high-level navigation and understanding of the plugin's structure.

@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Testing Setup
+
+## PHPUnit
+- PHPUnit is used for backend testing.
+- The configuration file is [phpunit.xml.dist](mdc:dokan-chatbot/phpunit.xml.dist).
+- Test bootstrap files are in [tests/bootstrap.php](mdc:dokan-chatbot/tests/bootstrap.php) and [tests/php/bootstrap.php](mdc:dokan-chatbot/tests/php/bootstrap.php).
+
+## Test Files
+- Main test files are located in the [tests/](mdc:dokan-chatbot/tests) directory:
+  - [tests/test-api.php](mdc:dokan-chatbot/tests/test-api.php): API endpoint tests.
+  - [tests/test-chat-history.php](mdc:dokan-chatbot/tests/test-chat-history.php): Chat history logic tests.
+  - [tests/test-context-builder.php](mdc:dokan-chatbot/tests/test-context-builder.php): Context builder logic tests.
+
+Refer to this rule for information on how to run and locate tests for the plugin.

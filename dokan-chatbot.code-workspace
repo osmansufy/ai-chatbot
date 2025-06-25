@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../dokan-lite"
+    },
+    {
+      "path": "../dokan-pro"
+    }
+  ],
+  "settings": {}
+} 

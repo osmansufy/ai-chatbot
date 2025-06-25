@@ -1,0 +1,40 @@
+{
+  "name": "dokan-chatbot",
+  "version": "1.0.1",
+  "description": "AI-powered chatbot for Dokan marketplace with role-based assistance for vendors and customers.",
+  "main": "index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "lint:md:docs": "wp-scripts lint-md-docs",
+    "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-zip": "wp-scripts plugin-zip",
+    "test:e2e": "wp-scripts test-e2e",
+    "test:unit": "wp-scripts test-unit-js"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^26.19.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
+  },
+  "dependencies": {
+    "@wordpress/api-fetch": "^6.36.0",
+    "@wordpress/components": "^25.16.0",
+    "@wordpress/element": "^5.24.0",
+    "@wordpress/i18n": "^4.47.0",
+    "@wordpress/url": "^3.47.0",
+    "html-react-parser": "^4.2.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# AI Logic and Integration
+
+## Core AI Services
+- The main AI service logic is in [includes/Chatbot/Services/ChatbotService.php](mdc:dokan-chatbot/includes/Chatbot/Services/ChatbotService.php).
+- Context for AI conversations is built in [includes/Chatbot/Services/ContextBuilder.php](mdc:dokan-chatbot/includes/Chatbot/Services/ContextBuilder.php).
+- Role and prompt management utilities are in [includes/Chatbot/Services/RoleManager.php](mdc:dokan-chatbot/includes/Chatbot/Services/RoleManager.php) and [includes/Chatbot/Utils/PromptTemplates.php](mdc:dokan-chatbot/includes/Chatbot/Utils/PromptTemplates.php).
+
+## REST API
+- The chatbot REST API endpoints are defined in [includes/Chatbot/REST/ChatbotController.php](mdc:dokan-chatbot/includes/Chatbot/REST/ChatbotController.php).
+- These endpoints handle chat requests, context retrieval, and message history.
+
+## Chat History
+- Chat history is managed in [includes/Chatbot/Utils/ChatHistory.php](mdc:dokan-chatbot/includes/Chatbot/Utils/ChatHistory.php).
+
+## Frontend Integration
+- The React frontend communicates with the REST API for chat operations, using components in [src/chatbot/components/](mdc:dokan-chatbot/src/chatbot/components).
+
+Use this rule to quickly locate and understand the AI-related logic and integration points in the plugin.

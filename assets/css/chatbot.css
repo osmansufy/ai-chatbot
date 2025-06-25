@@ -1,0 +1,438 @@
+/**
+ * Dokan AI Chatbot Styles
+ *
+ * @package DokanChatbot
+ */
+
+/* Additional custom styles for the chatbot */
+.dokan-chatbot-widget {
+    /* Ensure proper z-index */
+    z-index: 999999;
+}
+
+/* Animation for chatbot appearance */
+.dokan-chatbot-interface {
+    animation: dokan-chatbot-slide-in 0.3s ease-out;
+}
+
+@keyframes dokan-chatbot-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing indicator animation */
+.dokan-chatbot-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.dokan-chatbot-typing-dots {
+    display: flex;
+    gap: 2px;
+}
+
+.dokan-chatbot-typing-dots span {
+    width: 4px;
+    height: 4px;
+    background: #9ca3af;
+    border-radius: 50%;
+    animation: dokan-chatbot-typing-bounce 1.4s infinite ease-in-out;
+}
+
+.dokan-chatbot-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.dokan-chatbot-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes dokan-chatbot-typing-bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+/* Message animations */
+.dokan-chatbot-message {
+    animation: dokan-chatbot-message-in 0.3s ease-out;
+}
+
+@keyframes dokan-chatbot-message-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Suggestion hover effects */
+.dokan-chatbot-suggestion {
+    transition: all 0.2s ease;
+}
+
+.dokan-chatbot-suggestion:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Input focus effects */
+.dokan-chatbot-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+}
+
+/* Button hover effects */
+.dokan-chatbot-send:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .dokan-chatbot-widget {
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .dokan-chatbot-interface {
+        width: calc(100vw - 20px);
+        height: calc(100vh - 100px);
+        bottom: 60px;
+        right: 10px;
+    }
+}
+
+/* Accessibility improvements */
+.dokan-chatbot-button:focus,
+.dokan-chatbot-close:focus,
+.dokan-chatbot-send:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .dokan-chatbot-interface {
+        border: 2px solid #000;
+    }
+
+    .dokan-chatbot-message-content {
+        border: 1px solid #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .dokan-chatbot-interface,
+    .dokan-chatbot-message,
+    .dokan-chatbot-button,
+    .dokan-chatbot-send {
+        animation: none;
+        transition: none;
+    }
+
+    .dokan-chatbot-typing-dots span {
+        animation: none;
+    }
+}
+
+.dokan-chatbot-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dokan-chatbot-role-select {
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    background: white;
+}
+
+.dokan-chatbot-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.dokan-chatbot-clear:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.dokan-chatbot-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.dokan-chatbot-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.dokan-chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dokan-chatbot-message {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+}
+
+.dokan-chatbot-message-user {
+    align-self: flex-end;
+}
+
+.dokan-chatbot-message-ai {
+    align-self: flex-start;
+}
+
+.dokan-chatbot-message-content {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.dokan-chatbot-message-user .dokan-chatbot-message-content {
+    background: #007cba;
+    color: white;
+}
+
+.dokan-chatbot-message-ai .dokan-chatbot-message-content {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.dokan-chatbot-message-error .dokan-chatbot-message-content {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.dokan-chatbot-message-time {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+    align-self: flex-end;
+}
+
+.dokan-chatbot-suggestions {
+    padding: 12px 16px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dokan-chatbot-suggestion {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+}
+
+.dokan-chatbot-suggestion:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.dokan-chatbot-input-area {
+    border-top: 1px solid #e5e7eb;
+    padding: 16px;
+}
+
+.dokan-chatbot-input-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.dokan-chatbot-input {
+    flex: 1;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s ease;
+    max-height: 100px;
+    min-height: 40px;
+    background-color: white !important;
+    color: black !important;
+}
+
+.dokan-chatbot-input:focus {
+    border-color: #007cba !important;
+    background-color: white !important;
+    color: black !important;
+}
+
+.dokan-chatbot-send {
+    background: #007cba;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.dokan-chatbot-send:hover:not(:disabled) {
+    background: #005a87;
+    transform: scale(1.05);
+}
+
+.dokan-chatbot-send:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.dokan-chatbot-input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.dokan-chatbot-remaining {
+    font-weight: 500;
+}
+
+.dokan-chatbot-remaining-warning {
+    color: #dc2626;
+}
+
+.dokan-chatbot-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dokan-chatbot-loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.dokan-chatbot-loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: #007cba;
+    border-radius: 50%;
+    animation: dokan-chatbot-bounce 1.4s ease-in-out infinite both;
+}
+
+.dokan-chatbot-loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.dokan-chatbot-loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes dokan-chatbot-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .dokan-chatbot-interface {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 120px);
+        bottom: 60px;
+        right: 20px;
+    }
+
+    .dokan-chatbot-button {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .dokan-chatbot-button-text {
+        display: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .dokan-chatbot-interface {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+
+    .dokan-chatbot-header {
+        background: #111827;
+        border-bottom-color: #374151;
+    }
+
+    .dokan-chatbot-message-ai .dokan-chatbot-message-content {
+        background: #374151;
+        color: #f9fafb;
+    }
+
+    .dokan-chatbot-input {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .dokan-chatbot-suggestion {
+        background: #374151;
+        color: #f9fafb;
+        border-color: #4b5563;
+    }
+
+    .dokan-chatbot-suggestion:hover {
+        background: #4b5563;
+    }
+}

@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# React Frontend Structure
+
+## Main Entry Points
+- **Admin Interface**: [src/admin/index.js](mdc:dokan-chatbot/src/admin/index.js)
+- **Chatbot Widget**: [src/chatbot/index.js](mdc:dokan-chatbot/src/chatbot/index.js)
+
+## Key Components
+- [src/chatbot/components/ChatbotWidget.js](mdc:dokan-chatbot/src/chatbot/components/ChatbotWidget.js): Main chatbot UI container.
+- [src/chatbot/components/ChatbotMessages.js](mdc:dokan-chatbot/src/chatbot/components/ChatbotMessages.js): Displays chat messages.
+- [src/chatbot/components/ChatbotInput.js](mdc:dokan-chatbot/src/chatbot/components/ChatbotInput.js): User input field for sending messages.
+- [src/chatbot/components/ChatbotSuggestions.js](mdc:dokan-chatbot/src/chatbot/components/ChatbotSuggestions.js): Suggested prompts for users.
+- [src/chatbot/components/ChatbotHistory.js](mdc:dokan-chatbot/src/chatbot/components/ChatbotHistory.js): Shows previous chat sessions.
+
+## Backend Integration
+- The React frontend communicates with the backend via the REST API defined in [includes/Chatbot/REST/ChatbotController.php](mdc:dokan-chatbot/includes/Chatbot/REST/ChatbotController.php).
+- Handles chat message sending, receiving, and context updates.
+
+Refer to this rule for understanding and navigating the React-based frontend and its integration with the backend AI logic.
